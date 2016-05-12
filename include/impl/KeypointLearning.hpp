@@ -114,7 +114,7 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::initComp
 {
 	if (!Keypoint<PointInT, PointOutT>::initCompute())
 	{
-		PCL_ERROR("[pcl::%s::initCompute] init failed!\n", name_.c_str());
+		PCL_ERROR("[pcl::%s::initCompute] init failed!\n", this->name_.c_str());
 		return (false);
 	}
 
@@ -143,9 +143,9 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::initComp
 
 		this->normals_ = normals;
 	}
-	if (this->normals_->size() != surface_->size())
+	if (this->normals_->size() != this->surface_->size())
 	{
-		PCL_ERROR("[pcl::%s::initCompute] normals given, but the number of normals does not match the number of input points!\n", name_.c_str()/*, method_*/);
+		PCL_ERROR("[pcl::%s::initCompute] normals given, but the number of normals does not match the number of input points!\n", this->name_.c_str()/*, method_*/);
 		return (false);
 	}
 
@@ -198,7 +198,7 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::detectKe
 			std::vector<int> nn_indices;
 			std::vector<float> nn_dists;
 
-			tree_->radiusSearch(idx, this->non_maxima_radius_, nn_indices, nn_dists);
+			this->tree_->radiusSearch(idx, this->non_maxima_radius_, nn_indices, nn_dists);
 			bool is_maxima = true;
 			bool has_draw = false;
 			std::vector<int> draws;

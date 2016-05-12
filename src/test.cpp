@@ -66,7 +66,7 @@ int main(int argc, char** argv){
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr temp(new pcl::PointCloud<pcl::PointXYZ>());
 	//pcl::PointCloud<int> sampled_cloud;
-	pcl::io::loadPCDFile("../data/point_cloud_test/cheff000.pcd", *temp);
+	pcl::io::loadPCDFile("../data/point_cloud_test/cheff001.pcd", *temp);
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr sub_sampler_tree(new pcl::search::KdTree<pcl::PointXYZ>());
 	/*pcl::UniformSampling<pcl::PointXYZ>::Ptr sub_sampler(new pcl::UniformSampling<pcl::PointXYZ>());
 	sub_sampler->setRadiusSearch(2); //2mm

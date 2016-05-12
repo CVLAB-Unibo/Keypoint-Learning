@@ -83,7 +83,7 @@ namespace pcl
 			  , n_annulus_(n_annulus)
 			  , n_bins_(n_bins)
 		  {
-			  name_ = "Keypoint_Learnining_Detector";
+			  this->name_ = "Keypoint_Learnining_Detector";
 		  }
 
 		  /** \brief Empty destructor */

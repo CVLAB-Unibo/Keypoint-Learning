@@ -37,7 +37,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/integral_image_normal.h>
-#include <pcl/keypoints/uniform_sampling.h>
+#include <pcl/filters/uniform_sampling.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #define PCL_NO_PRECOMPILE
 #include "KeypointLearning.h"
@@ -65,18 +65,18 @@ int main(int argc, char** argv){
 	//load and subsample point cloud
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr temp(new pcl::PointCloud<pcl::PointXYZ>());
-	pcl::PointCloud<int> sampled_cloud;
+	//pcl::PointCloud<int> sampled_cloud;
 	pcl::io::loadPCDFile("../data/point_cloud_test/cheff000.pcd", *temp);
 	pcl::search::KdTree<pcl::PointXYZ>::Ptr sub_sampler_tree(new pcl::search::KdTree<pcl::PointXYZ>());
-	pcl::UniformSampling<pcl::PointXYZ>::Ptr sub_sampler(new pcl::UniformSampling<pcl::PointXYZ>());
+	/*pcl::UniformSampling<pcl::PointXYZ>::Ptr sub_sampler(new pcl::UniformSampling<pcl::PointXYZ>());
 	sub_sampler->setRadiusSearch(2); //2mm
 	sub_sampler->setSearchMethod(sub_sampler_tree);
 	sub_sampler->setInputCloud(temp);
-	sub_sampler->compute(sampled_cloud);
-	for (int j = 0; j < sampled_cloud.points.size(); j++)
-	{
-		cloud->push_back(temp->points[sampled_cloud.points[j]]);
-	}
+	sub_sampler->compute(sampled_cloud);*/
+ 	pcl::UniformSampling<pcl::PointXYZ>::Ptr source_uniform_sampling(new pcl::UniformSampling<pcl::PointXYZ>());
+	source_uniform_sampling->setRadiusSearch(2);
+	source_uniform_sampling->setInputCloud (temp);
+	source_uniform_sampling->filter(*cloud);
 	std::cout << "Point cloud loaded" << std::endl;
 
 	//compute normals

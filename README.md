@@ -58,10 +58,12 @@ The required console arguments are the following:
 
 Data
 --------
-This folder contains trained random forest for Laser Scanner dataset:
+The folder random_forest contains trained random forest for Laser Scanner dataset:
 * FPFH-LaserScanner.yaml.gz: random forest trained with FPFH as descriptor.
 * SHOT-LaserScanner.yaml.gz: random forest trained with SHOT as descriptor.
 * SPINIMAGES-LaserScanner.yaml.gz: random forest trained with SPINIMAGES as descriptor.
+
+The folder point_cloud contains examples of 2.5D views obtained from Laser Scanner dataset.
 
 Dependencies
 --------

@@ -21,13 +21,24 @@ http://rdcu.be/uQch
 
 Usage
 --------
-### GenerateTrainingSet: this sample create positive and negative samples to train random forest.
-The algorithm requires a dataset of 2.5 views of full 3d model, along with two file: groundTruth.txt containing groundtruth matrix (affine transformation from 2.5 views to full 3d model) and overlappingAreas.txt with list of overllaping areas between 2.5 views. For details, refer to the examples in: data/example_groundTruth.txt and data/example_overlappingAreas.txt
+
+### GenerateTrainingSet: implementation of training set generation for random forest train.
+The algorithm requires a set of calibrated 2.5D views of 3d objects (divided into folders: object_name/2.5D_views/), along with two files, groundTruth.txt containing groundtruth matrix (affine transformation from 2.5D views to full 3d model) and overlappingAreas.txt a list of overalapping areas between 2.5D pairs. For details, refer to the examples in: data/example_groundTruth.txt and data/example_overlappingAreas.txt.
+
+For what concern the descriptor to use, the algorithm is customizable by modifying the function computeDescriptorsPerView() in view_manager.hpp.
 
 To increase efficiency, is possible to enable multithreading defining global variables: MULTITHREAD and MULTIVIEW.
+The required console arguments are the following:
 
+*	distance: euclidean distance to accept points with similar descriptor.
+*	ext: dataset file extension.
+*	pathDataset: path to folder with 3d object 2.5D views.
+*	pathTrainingset: path for generated traning set.
+* radiusNegative: radius for negative generation.		
+* radiusNms: radius for non maxima suppression on positive.
+* overlap: overlapping threshold between views.
 
-#### TrainDetector: this sample train and save random forest using features described in [1]. The required console arguments are the following:
+##### TrainDetector: this sample train and save random forest using features described in [1]. The required console arguments are the following:
 * annuli: annuli for features computation.
 *	bins: bins for features computation.
 * pathDataset: path to dataset (same folder used in GenerateTrainingSet)

@@ -10,13 +10,9 @@ The framework is composed by three different projects:
  
 If you use this code please refer to:
 
-[1] **Learning a Descriptor-Specific 3D Keypoint Detector**, *Samuele Salti*, *Federico Tombari*, *Riccardo Spezialetti*, *Luigi Di Stefano*; The IEEE International Conference on Computer Vision (ICCV), 2015, pp. 2318-2326.
+[1] [**Learning a Descriptor-Specific 3D Keypoint Detector**, *Samuele Salti*, *Federico Tombari*, *Riccardo Spezialetti*, *Luigi Di Stefano*; The IEEE International Conference on Computer Vision (ICCV), 2015, pp. 2318-2326.](http://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Salti_Learning_a_Descriptor-Specific_ICCV_2015_paper.pdf)
 
-http://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Salti_Learning_a_Descriptor-Specific_ICCV_2015_paper.pdf
-
-[2] **Learning to Detect Good 3D Keypoints**, *Alessio Tonioni*, *Samuele Salti*, *Federico Tombari*, *Riccardo Spezialetti*, *Luigi Di Stefano*; International Journal of Computer Vision (IJCV), 2017.
-
-http://rdcu.be/uQch
+[2] [**Learning to Detect Good 3D Keypoints**, *Alessio Tonioni*, *Samuele Salti*, *Federico Tombari*, *Riccardo Spezialetti*, *Luigi Di Stefano*; International Journal of Computer Vision (IJCV), 2017.](http://rdcu.be/uQch)
 
 
 Usage

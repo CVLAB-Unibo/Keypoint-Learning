@@ -1,0 +1,7 @@
+Num Meshes:
+3
+Num View pairs:
+2
+view pair ID; first view ID; second view ID; first view name; second view name; overlapping area percentage
+0 0 1 cheff000 cheff001 0.165119
+1 1 2 cheff001 cheff002 0.638556

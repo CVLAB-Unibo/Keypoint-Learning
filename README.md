@@ -21,6 +21,11 @@ http://rdcu.be/uQch
 
 Usage
 --------
+### GenerateTrainingSet: this sample create positive and negative samples to train random forest.
+The algorithm requires a dataset of 2.5 views of full 3d model, along with two file: groundTruth.txt containing groundtruth matrix (affine transformation from 2.5 views to full 3d model) and overlappingAreas.txt with list of overllaping areas between 2.5 views. For details, refer to the examples in: data/example_groundTruth.txt and data/example_overlappingAreas.txt
+
+To increase efficiency, is possible to enable multithreading defining global variables: MULTITHREAD and MULTIVIEW.
+
 
 #### TrainDetector: this sample train and save random forest using features described in [1]. The required console arguments are the following:
 * annuli: annuli for features computation.

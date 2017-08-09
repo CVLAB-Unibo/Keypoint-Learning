@@ -22,6 +22,24 @@ http://rdcu.be/uQch
 Usage
 --------
 
+### TrainDetector: this sample train and save random forest using features described in [1]. The required console arguments are the following:
+* annuli: Annuli for features computation.
+*	bins: Bins for features computation.
+* pathDataset: Path to dataset (same folder used in GenerateTrainingSet)
+* pathTrainingData: Path for training data-> Positives in: pathTrainingData\\Model_Name\\positives and Negatives in: pathTrainingData\\Model_Name\\negatives.
+* pathRF: Path for Random Forest.
+* radiusFeatures: Radius for features computation.
+*	msc: Min samples count of Random Forest.
+* nameRF: Name of YAML file.
+* ntrees: Number of trees of Random Forest.
+
+### TestDetector: example of keypoints detection on point cloud. The required console arguments are the following:
+* pathCloud: path to point cloud.
+* pathRF: path to trained random forest.
+* radiusFeatures: features support.
+* radiusNMS: non maxima suppression radius.
+* threshold: minimum forest output score to accept a point as keypoint. Value between 0 and 1.
+
 Data
 --------
 This folder contains trained random forest for Laser Scanner dataset:

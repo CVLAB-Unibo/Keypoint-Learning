@@ -39,6 +39,7 @@
 #define PCL_KEYPOINTS_IMPL_KEYPOINT_LEARNING_H_
 
 #include "KeypointLearning.h"
+
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/integral_image_normal.h>
 
@@ -54,6 +55,7 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::setInput
 	}
 	this->input_ = cloud;
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointInT, typename PointOutT, typename NormalT> void
 pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::setNonMaxima(bool non_maxima)
@@ -81,6 +83,7 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::setNorma
 {
 	this->normals_ = normals;
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 template<typename PointInT, typename PointOutT, typename NormalT> void
 pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::setPredictionThreshold(double th)
@@ -108,6 +111,7 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::setNBins
 {
 	this->n_bins_ = n_bins;
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointInT, typename PointOutT, typename NormalT> bool
 pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::initCompute()
@@ -138,14 +142,13 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::initComp
 			normal_estimation.setInputCloud(this->surface_);
 			normal_estimation.setNormalSmoothingSize(5.0);
 			normal_estimation.compute(*normals);
-
 		}
 
 		this->normals_ = normals;
 	}
 	if (this->normals_->size() != this->surface_->size())
 	{
-		PCL_ERROR("[pcl::%s::initCompute] normals given, but the number of normals does not match the number of input points!\n", this->name_.c_str()/*, method_*/);
+		PCL_ERROR("[pcl::%s::initCompute] normals given, but the number of normals does not match the number of input points!\n", this->name_.c_str());
 		return (false);
 	}
 
@@ -156,10 +159,20 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::initComp
 template<typename PointInT, typename PointOutT, typename NormalT> bool
 pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::loadForest(const std::string & path)
 {
-	this->forest_.load(path.c_str(), 0);
-	if (this->forest_.get_tree_count() == 0)
-		std::cerr << "[PROBLEM LOADING FOREST FOR SHOTKPL]: " << path << std::endl;
-	return (this->forest_.get_tree_count() != 0);
+	forest_ = cv::ml::RTrees::load(path);
+	bool return_value = false;
+
+	if (forest_ == NULL)
+	{
+		PCL_ERROR("[pcl::%s::loadForest] impossible to load random forest with path %s \n", name_.c_str(), path.c_str());
+		return (false);
+	}
+	else
+	{
+		return_value = (forest_->getRoots().size() != 0);
+	}
+	return return_value;
+	
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,14 +198,13 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::detectKe
 	{
 		output.points.clear();
 		output.points.reserve(response->points.size());
-		std::cout << "Radius non maxima suprresion KPL: " << this->non_maxima_radius_ << std::endl;
-		std::vector<int> skipList;
 
+		std::vector<int> skipList;
 		for (int idx = 0; idx < static_cast<int> (response->points.size()); ++idx)
 		{
 			if (!isFinite(response->points[idx]) ||
 				!pcl_isfinite(response->points[idx].intensity) ||
-				response->points[idx].intensity < this->prediction_th_/*threshold_*/)
+				response->points[idx].intensity < this->prediction_th_)
 				continue;
 
 			std::vector<int> nn_indices;
@@ -255,52 +267,68 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::detectKe
 template <typename PointInT, typename PointOutT, typename NormalT> void
 pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::runForest(PointCloudOut &output) const
 {
-	//  PCL_ALIGN (16) float covar [8];
-	//output.reserve (input_->size ());
-#ifdef _OPENMP
-#pragma omp parallel for shared (output) private (covar) num_threads(threads_)
-#endif
-	std::cout << "Feature radius for KPL: " << this->search_parameter_ << std::endl;
+
+	const int forest_size = static_cast<int>(forest_->getRoots().size());
+
 	for (int pIdx = 0; pIdx < static_cast<int> (this->input_->size()); ++pIdx)
 	{
 		const PointInT& pointIn = this->input_->points[pIdx];
-		//    output [pIdx].intensity = 0.0; //std::numeric_limits<float>::quiet_NaN ();
+	
 		if (isFinite(pointIn) && isFinite(this->normals_->points[pIdx]))
 		{
-
 			cv::Mat feat = computePointFeatures(pIdx);
-			float prob = 1 - (this->forest_.predict_prob(feat, cv::Mat()));
-			feat.release();
-			
-			PointOutT point;
-			point.x = pointIn.x;
-			point.y = pointIn.y;
-			point.z = pointIn.z;
-			point.intensity = prob;
-			output.push_back(point);
+			cv::Mat result = cv::Mat();
+			const float sum = this->forest_->predict(feat, result, cv::ml::RTrees::Flags::PREDICT_SUM);
 
+			PointOutT point_out;
+			point_out.x = pointIn.x;
+			point_out.y = pointIn.y;
+			point_out.z = pointIn.z;
+			point_out.intensity = 1 - (sum / (forest_size * 1.0f));
+
+			output.push_back(point_out);
 		}
-
 	}
+
 	output.height = 1;
 	output.width = static_cast<uint32_t> (output.points.size());
 	output.is_dense = true;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <typename PointInT, typename PointOutT, typename NormalT> cv::Mat
+pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::computePointsForTrainingFeatures(pcl::PointIndicesConstPtr indices) 
+{
+	cv::Mat features;
+	if (!this->initCompute())
+	{
+		return features;
+	}
 
+	for (size_t i_p=0; i_p < indices->indices.size(); ++i_p)
+	{
+		features.push_back(computePointFeatures(indices->indices[i_p]));
+	}
+
+	// Reset the surface
+	if (input_ == surface_)
+		surface_.reset();
+
+	return features;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointInT, typename PointOutT, typename NormalT> cv::Mat
 pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::computePointFeatures(int point_index) const
 {
-
 	cv::Mat features_row(1, n_annulus_ * n_bins_, CV_32F);
 	Eigen::MatrixXf histograms = Eigen::MatrixXf::Zero(n_annulus_, n_bins_);
+
 	std::vector<int> indices;
 	std::vector<float> distances;
 	std::vector<int> annulus(this->n_annulus_);
 	std::vector<float> bins(this->n_bins_);
-	//std::cout<< "Calcolo features per: " << point_index << std::endl;
+	
 	Eigen::Vector3f point_vector = this->normals_->points[point_index].getNormalVector3fMap();
 
 	if (this->searchForNeighbors(point_index, this->search_parameter_, indices, distances) > 0)
@@ -321,7 +349,8 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::computeP
 
 				histograms(annulus_index, bin_index) += ((1 - bin_weight)*(1 - annulus_weight));
 				histograms(annulus_index, bin_pair) += ((bin_weight)*(1 - annulus_weight));
-				//aggiorno histogram del annulus pair
+				
+				//update histogram of annulus pair
 				histograms(annulus_pair, bin_index) += ((1 - bin_weight)*(annulus_weight));
 				histograms(annulus_pair, bin_pair) += ((bin_weight)*(annulus_weight));
 			}
@@ -336,16 +365,16 @@ pcl::keypoints::KeypointLearningDetector<PointInT, PointOutT, NormalT>::computeP
 			}
 			for (int k = 0; k < this->n_bins_; k++)
 			{
-
 				features_row.at<float>(0, (i*this->n_bins_) + k) = (histograms(i, k));
 			}
 		}
 	}
 	else
-		std::cerr << "Il punto " << point_index << " non ha vicini" << std::endl;
+		std::cerr << "Skip features computation for point: " << point_index << std::endl;
 
 	return features_row;
 }
+
 #define PCL_INSTANTIATE_KeypointLearningDetector(T,U,N) template class PCL_EXPORTS pcl::KeypointLearningDetector<T,U,N>;
 
 

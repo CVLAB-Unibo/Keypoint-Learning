@@ -39,7 +39,7 @@
 #define PCL_KEYPOINT_KEYPOINT_LEARNING_H_
 
 #include <pcl/keypoints/keypoint.h>
-#include <opencv2/ml/ml.hpp>
+#include <ml.h>
 
 namespace pcl
 {
@@ -71,9 +71,12 @@ namespace pcl
 		  typedef typename PointCloudN::ConstPtr PointCloudNConstPtr;
 
 		  /** \brief Constructor
-		  * \param[in] method the method to be used to determine the corner responses
-		  * \param[in] radius the radius for normal estimation as well as for non maxima suppression
-		  * \param[in] threshold the threshold to filter out weak corners
+		  * \param[in] prediction threshold for random forest
+		  * \param[in] non maxima suppresion flag
+		  * \param[in] flag to remove keypoint with same intensity in non maxina suppression
+		  * \param[in] radius for non maxina suppression
+		  * \param[in] number of annuli in features computation
+		  * \param[in] number of bins in features computation
 		  */
 		  KeypointLearningDetector(double prediction_th = 0.5f, bool non_maxima = true, bool non_maxima_draws_remove = true, double non_max_radius = 0.0f, int n_annulus = 5, int n_bins = 10)
 			  : prediction_th_ (prediction_th)
@@ -87,7 +90,11 @@ namespace pcl
 		  }
 
 		  /** \brief Empty destructor */
-		  virtual ~KeypointLearningDetector() {}
+		  virtual ~KeypointLearningDetector() 
+		  {
+			  if(forest_!=0)
+				 forest_.release();
+		  }
 
 		  /** \brief Provide a pointer to the input dataset
 			* \param[in] cloud the const boost shared pointer to a PointCloud message
@@ -146,10 +153,15 @@ namespace pcl
 		  */
 		  virtual void
 			  setNBins (int n_bins); 
+
+		  /** \brief Compute features for point
+		  * \param[in] point index in input cloud
+		  */
+		  cv::Mat computePointsForTrainingFeatures(pcl::PointIndicesConstPtr indices);
+
 	  protected:
 
-		  bool
-			 initCompute ();
+		  bool initCompute();
 
 		  /** \brief Key point detection method. */
 		  virtual void
@@ -159,37 +171,38 @@ namespace pcl
 		  virtual void 
 			  runForest (PointCloudOut &output) const;
 
-		  cv::Mat
-			  computePointFeatures (int point_index) const;
+		  /** \brief Compute features for point
+		  * \param[in] point index in input cloud
+		  */
+		  cv::Mat computePointFeatures(int point_index) const;
 
-		  //the possibility of non maxima suppresion.
+		  /** \brief The possibility of non maxima suppresion.*/
 		  bool non_maxima_;
 
-		  //the possibility of remove draw in non maxima suppression
+		  /** \brief The possibility of remove draw in non maxima suppression.*/
 		  bool non_maxima_draws_remove_;
 
-		  //the maximum distance between two draw points that let one of the two survive.
+		  /** \brief The maximum distance between two draw points that let one of the two survive.*/
 		  float non_maxima_draws_threshold_;
 
-		  // the minimum forest output score to accept a point as keypoint.
+		  /** \brief The minimum forest output score to accept a point as keypoint.*/
 		  double prediction_th_;
 
-		  // the non maxima suppression radius
+		  /** \brief The non maxima suppression radius.*/
 		  double non_maxima_radius_;
 
-		  // the number of radial annulus used to compute the forest input features
+		  /** \brief The number of radial annulus used to compute the forest input features.*/
 		  int n_annulus_;
 
-		  // the number of normal cosine angle histogram bins used to compute the forest input features
+		  /** \brief The number of normal cosine angle histogram bins used to compute the forest input features.*/
 		  int n_bins_;
 
-		  // the Random Forest
-		   cv::RandomTrees forest_;
+		  /** \brief the Random Forest.*/
+		  cv::Ptr<cv::ml::RTrees> forest_;
 
-		  // Search Surface Cloud Normals
+		  /** \brief Search Surface Cloud Normals.*/
 		  PointCloudNConstPtr normals_;
 
-      
 	  };
   }
 }

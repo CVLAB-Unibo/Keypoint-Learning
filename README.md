@@ -22,6 +22,13 @@ http://rdcu.be/uQch
 Usage
 --------
 
+Data
+--------
+This folder contains trained random forest for Laser Scanner dataset:
+* FPFH-LaserScanner.yaml.gz: random forest trained with FPFH as descriptor.
+* SHOT-LaserScanner.yaml.gz: random forest trained with SHOT as descriptor.
+* SPINIMAGES-LaserScanner.yaml.gz: random forest trained with SPINIMAGES as descriptor.
+
 Dependencies
 --------
 * Point Cloud Library 1.8.0

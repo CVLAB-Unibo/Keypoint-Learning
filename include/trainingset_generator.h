@@ -42,7 +42,7 @@
 namespace kpl
 {
 	/** \brief Implementation of algorithm for training set generation as presentend in:
-	*	Salti S., Tombari F., Spezialetti R., Di Stefano L., "Learning a Descriptor-Specific 3D Keypoint Detector", The IEEE International Conference on Computer Vision (ICCV), 2015, pp. 2318-2326.
+	*	 "Learning a Descriptor-Specific 3D Keypoint Detector", Salti S., Tombari F., Spezialetti R., Di Stefano L., The IEEE International Conference on Computer Vision (ICCV), 2015, pp. 2318-2326.
 	*
 	*	\author Riccardo Spezialetti
 	*/

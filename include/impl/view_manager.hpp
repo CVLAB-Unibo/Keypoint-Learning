@@ -213,10 +213,10 @@ kpl::ViewManager<PointT, NormalT, HistogramT>::loadDescriptors(std::vector<typen
 		{
 			if (views[i_v].id_ == ids_names[i_p].first)
 			{
-				pcl::PointCloud<HistogramT>::Ptr c_histrogram(new pcl::PointCloud<HistogramT>());
+				pcl::PointCloud<HistogramT>::Ptr c_histogram(new pcl::PointCloud<HistogramT>());
 
 				//Load descriptors
-				if (pcl::io::loadPCDFile<HistogramT>(ids_names[i_p].second, *c_histrogram) == -1)
+				if (pcl::io::loadPCDFile<HistogramT>(ids_names[i_p].second, *c_histogram) == -1)
 				{
 					std::cerr << "Impossible to load descriptors: " << ids_names[i_p].second << std::endl;
 					return;
@@ -224,7 +224,7 @@ kpl::ViewManager<PointT, NormalT, HistogramT>::loadDescriptors(std::vector<typen
 
 				//Nan removing
 				views[i_v].c_descriptors_.reset(new pcl::PointCloud<HistogramT>());
-				removeNaNFromHistogram(*c_histrogram, *views[i_v].c_descriptors_, views[i_v].map_point_desc_);
+				removeNaNFromHistogram(*c_histogram, *views[i_v].c_descriptors_, views[i_v].map_point_desc_);
 
 				break;
 			}
